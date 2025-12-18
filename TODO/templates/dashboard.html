@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard-grid fade-in">
+    <!-- Welcome Section - PC Optimized -->
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <div class="welcome-text">
+                <h1>
+                    <i class="fas fa-user-circle"></i>
+                    Welcome back, {{ current_user.name }}!
+                </h1>
+                <p>Manage your tasks efficiently and stay productive</p>
+            </div>
+            <div class="welcome-stats">
+                <div class="stat-box">
+                    <i class="fas fa-tasks"></i>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ task|length if task else 0 }}</div>
+                        <div class="stat-label">Total Tasks</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-content">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ task|length if task else 0 }}</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Form - PC Optimized -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-plus-circle"></i>
+            <div>
+                <h2 style="margin: 0;">Add New Task</h2>
+                <p style="color: var(--text-muted); margin: 5px 0 0 0;">Create a new task with all necessary details</p>
+            </div>
+        </div>
+        
+        <form action="" method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="task_name">
+                        <i class="fas fa-tag"></i> Task Name
+                    </label>
+                    <input type="text" name="task_name" id="task_name" placeholder="What needs to be done?" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="comp_date">
+                        <i class="fas fa-calendar-alt"></i> Due Date
+                    </label>
+                    <input type="datetime-local" name="comp_date" id="comp_date" min="{{ today_date }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="prio">
+                        <i class="fas fa-exclamation-circle"></i> Priority Level
+                    </label>
+                    <select name="prio" id="prio" required>
+                        <option value="">Select priority level</option>
+                        <option value="Urgent">🚨 Urgent</option>
+                        <option value="High Priority">🔥 High</option>
+                        <option value="Medium Priority">⚡ Medium</option>
+                        <option value="Least Priority">🌱 Low</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cato">
+                        <i class="fas fa-folder"></i> Task Category
+                    </label>
+                    <select name="cato" id="cato" required>
+                        <option value="">Select category</option>
+                        <option value="Personal">👤 Personal</option>
+                        <option value="Family">👨‍👩‍👧‍👦 Family</option>
+                        <option value="Office">💼 Office</option>
+                        <option value="Hobby">🎨 Hobby</option>
+                    </select>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="task_desc">
+                        <i class="fas fa-align-left"></i> Task Description
+                    </label>
+                    <textarea name="task_desc" id="task_desc" placeholder="Add details, notes, or instructions for this task... (Optional)" rows="4"></textarea>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Task to List
+            </button>
+        </form>
+    </div>
+
+    <!-- Tasks Table Section -->
+    <div class="table-section">
+        <div class="table-header">
+            <div>
+                <h2><i class="fas fa-list-check"></i> Your Tasks</h2>
+                <p style="color: var(--text-muted); margin-top: 5px;">Overview of all your pending tasks</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <span class="badge badge-urgent" style="cursor: pointer;">Urgent</span>
+                    <span class="badge badge-high" style="cursor: pointer;">High</span>
+                    <span class="badge badge-medium" style="cursor: pointer;">Medium</span>
+                    <span class="badge badge-low" style="cursor: pointer;">Low</span>
+                </div>
+                <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: var(--primary-color); padding: 10px 16px; font-size: 1rem;">
+                    {{ task|length }} task{{ 's' if task|length != 1 }}
+                </span>
+            </div>
+        </div>
+
+        {% if task %}
+        <div class="table-container fade-in">
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="min-width: 200px;">Task Name</th>
+                            <th style="min-width: 250px;">Description</th>
+                            <th style="min-width: 150px;">Due Date</th>
+                            <th style="min-width: 120px;">Priority</th>
+                            <th style="min-width: 120px;">Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in task %}
+                        <tr>
+                            <td style="font-weight: 600; color: var(--text-primary);">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 8px; height: 8px; border-radius: 50%; 
+                                        {% if t.priority == 'Urgent' %}background: #ef4444;
+                                        {% elif t.priority == 'High Priority' %}background: #f59e0b;
+                                        {% elif t.priority == 'Medium Priority' %}background: #3b82f6;
+                                        {% else %}background: #10b981;{% endif %}">
+                                    </div>
+                                    {{ t.task_name }}
+                                </div>
+                            </td>
+                            <td>
+                                {% if t.task_desc %}
+                                    <div style="max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ t.task_desc }}
+                                    </div>
+                                {% else %}
+                                    <span style="color: var(--text-muted); font-style: italic;">No description</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="far fa-calendar" style="color: var(--text-muted); font-size: 1rem;"></i>
+                                    <span style="font-size: 0.9rem;">
+                                        {% if t.comp_date is string %}
+                                            {{ t.comp_date }}
+                                        {% else %}
+                                            {{ t.comp_date.strftime('%d %b %Y') }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if t.priority == 'Urgent' %}
+                                    <span class="badge badge-urgent" style="font-size: 0.85rem;">
+                                        {{ t.priority }}
+                                    </span>
+                                {% elif t.priority == 'High Priority' %}
+                                    <span class="badge badge-high" style="font-size: 0.85rem;">
+                                        High
+                                    </span>
+                                {% elif t.priority == 'Medium Priority' %}
+                                    <span class="badge badge-medium" style="font-size: 0.85rem;">
+                                        Medium
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-low" style="font-size: 0.85rem;">
+                                        Low
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="category-tag" style="font-size: 0.85rem;">
+                                    {% if t.cato == 'Personal' %}
+                                        <i class="fas fa-user"></i>
+                                    {% elif t.cato == 'Family' %}
+                                        <i class="fas fa-users"></i>
+                                    {% elif t.cato == 'Office' %}
+                                        <i class="fas fa-briefcase"></i>
+                                    {% elif t.cato == 'Hobby' %}
+                                        <i class="fas fa-palette"></i>
+                                    {% else %}
+                                        <i class="fas fa-folder"></i>
+                                    {% endif %}
+                                    {{ t.cato }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if task|length > 5 %}
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    Showing {{ task|length }} tasks
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="card fade-in">
+            <div class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>No tasks yet</h3>
+                <p>Get started by adding your first task above!</p>
+                <div style="margin-top: 25px;">
+                    <button class="btn btn-primary" onclick="document.querySelector('form').scrollIntoView({behavior: 'smooth'})">
+                        <i class="fas fa-plus"></i> Create First Task
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-focus on task name input
+        const taskNameInput = document.getElementById('task_name');
+        if (taskNameInput) {
+            taskNameInput.focus();
+        }
+        
+        // Make table rows clickable
+        const tableRows = document.querySelectorAll('tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('click', function() {
+                // Remove highlight from all rows
+                tableRows.forEach(r => r.style.backgroundColor = '');
+                // Add highlight to clicked row
+                this.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+            });
+        });
+        
+        // Filter tasks by priority
+        const filterBadges = document.querySelectorAll('.badge[style*="cursor: pointer"]');
+        filterBadges.forEach(badge => {
+            badge.addEventListener('click', function() {
+                const priority = this.textContent.trim().toLowerCase();
+                tableRows.forEach(row => {
+                    const rowPriority = row.querySelector('.badge').textContent.trim().toLowerCase();
+                    if (priority === 'all' || rowPriority.includes(priority)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}
